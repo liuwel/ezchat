@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <script src="jquery.js"></script>
+</head>
+<body>
+
+
+<input type="text" id="message">
+<button type="button" id="send-button">send</button>
+
+
+<ul id="message-list">
+
+</ul>
+
+</body>
+
+<script>
+
+    var token = 'user1';
+
+    var IM = {
+        token:'',
+        _ws:null,
+        fd:null,
+        init:function(dsn,token){
+            this._ws = new WebSocket(dsn);
+            this._ws.onopen = this.onOpen;
+            this._ws.onmessage = this.onMessage;
+            this._ws.onclose = this.onClose;
+            this.token = token;
+        },
+        run:function(){
+            this.send({
+                command:'init',
+                options:{token:this.token}
+            })
+        },
+        onOpen:function(){
+            IM.run();
+        },
+        onMessage:function(evt){
+            var data = JSON.parse(evt.data);
+            switch(data.cmd){
+                case 'init':
+                    IM.fd = data.fd;
+                    break;
+            }
+
+            console.log(IM.fd);
+            console.log(data);
+        },
+        onClose:function(evt){
+            IM._ws = null;
+        },
+        send:function(data){
+            this._ws.send(JSON.stringify(data));
+        },
+        sendMessage:function(message){
+            this.send({
+                command:'message',
+                options:{
+                    type: 1,
+                    content: message
+                }
+            })
+        }
+    };
+
+    IM.init('ws://127.0.0.1:9502',token);
+
+    $("#send-button").on('click',function(){
+        IM.sendMessage($("#message").val());
+    });
+
+</script>
+
+</html>
