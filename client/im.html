@@ -8,7 +8,7 @@
 <body>
 
 
-<input type="text" id="message">
+<input type="text" id="message" />
 <button type="button" id="send-button">send</button>
 
 
@@ -26,12 +26,13 @@
         token:'',
         _ws:null,
         fd:null,
-        init:function(dsn,token){
-            this._ws = new WebSocket(dsn);
+        init:function(url,token){
+            this._ws = new WebSocket(url);
             this._ws.onopen = this.onOpen;
             this._ws.onmessage = this.onMessage;
             this._ws.onclose = this.onClose;
             this.token = token;
+            console.log(this._ws);
             return this;
         },
         run:function(){
@@ -45,9 +46,13 @@
         },
         onMessage:function(evt){
             var data = JSON.parse(evt.data);
-            switch(data.cmd){
+            switch(data.command){
                 case 'init':
                     //IM.fd = data.fd;
+                    break;
+                case 'message':
+                    $("#message-list").append('<li>'+data.options.content+'</li>');
+                    console.log(data.options.content);
                     break;
             }
 
@@ -70,7 +75,7 @@
         }
     };
 
-    IM.init('ws://localhost:8899/chat',token);
+    IM.init('ws://192.168.0.216:8899/chat',token);
 
     $("#send-button").on('click',function(){
         IM.sendMessage($("#message").val());
