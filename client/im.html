@@ -32,6 +32,7 @@
             this._ws.onmessage = this.onMessage;
             this._ws.onclose = this.onClose;
             this.token = token;
+            return this;
         },
         run:function(){
             this.send({
@@ -46,11 +47,10 @@
             var data = JSON.parse(evt.data);
             switch(data.cmd){
                 case 'init':
-                    IM.fd = data.fd;
+                    //IM.fd = data.fd;
                     break;
             }
 
-            console.log(IM.fd);
             console.log(data);
         },
         onClose:function(evt){
@@ -70,7 +70,7 @@
         }
     };
 
-    IM.init('ws://127.0.0.1:9502',token);
+    IM.init('ws://localhost:8899/chat',token);
 
     $("#send-button").on('click',function(){
         IM.sendMessage($("#message").val());
